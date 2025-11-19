@@ -1,6 +1,6 @@
 {
   "name": "junit-to-elasticsearch",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Convert JUnit XML to NDJSON and upload to Elasticsearch via bulk api",
   "main": "index.js",
   "bin": {

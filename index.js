@@ -20,7 +20,7 @@ function flattenObject(obj, prefix = '') {
   return flattened;
 }
 
-async function convertJUnitToNDJSONObject(inputFile) {
+async function convertJUnitToNDJSONObject(inputFile, testRun) {
   try {
     const xmlContent = fs.readFileSync(inputFile, 'utf8');
     const result = await parseStringPromise(xmlContent);
@@ -48,6 +48,8 @@ async function convertJUnitToNDJSONObject(inputFile) {
           className: testcase.$.classname,
           "@timestamp": testcase.$.timestamp,
           duration: parseFloat(testcase.$.time),
+          runnerName: testRun.runnerName,
+          runId: testRun.runId,
           hasFailure: false,
           hasFlakyFailure: false,
           testsuiteMetadata
@@ -189,6 +191,10 @@ function parseArgs(args) {
       index: null,
       apiKey: null,
       serverMode: null,
+    },
+    testRun: {
+      runnerName: null,
+      runId: null,
     }
   };
 
@@ -203,6 +209,10 @@ function parseArgs(args) {
       config.esConfig.apiKey = args[++i];
     } else if (arg === '--es-server-mode') {
       config.esConfig.serverMode = args[++i];
+    } else if (arg === '--runner-name') {
+      config.testRun.runnerName = args[++i];
+    } else if (arg === '--run-id') {
+      config.testRun.runId = args[++i];
     } else if (!config.inputFile) {
       config.inputFile = arg;
     }
@@ -232,7 +242,7 @@ if (!config.esConfig.url || !config.esConfig.index || !config.esConfig.apiKey ||
 
 // Main execution
 (async () => {
-  const ndjsonObj = await convertJUnitToNDJSONObject(inputFile, outputFile);
+  const ndjsonObj = await convertJUnitToNDJSONObject(inputFile, config.testRun);
 
   await uploadToElasticsearch(ndjsonObj, config.esConfig);
 })();

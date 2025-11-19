@@ -50,6 +50,7 @@ async function convertJUnitToNDJSONObject(inputFile, testRun) {
           duration: parseFloat(testcase.$.time),
           runnerName: testRun.runnerName,
           runId: testRun.runId,
+          extra: testRun.extra,
           hasFailure: false,
           hasFlakyFailure: false,
           testsuiteMetadata
@@ -195,6 +196,7 @@ function parseArgs(args) {
     testRun: {
       runnerName: null,
       runId: null,
+      extra: null,
     }
   };
 
@@ -213,6 +215,8 @@ function parseArgs(args) {
       config.testRun.runnerName = args[++i];
     } else if (arg === '--run-id') {
       config.testRun.runId = args[++i];
+    } else if (arg === '--extra') {
+      config.testRun.extra = args[++i];
     } else if (!config.inputFile) {
       config.inputFile = arg;
     }
@@ -232,7 +236,6 @@ if (args.length < 1) {
 
 const config = parseArgs(args);
 const inputFile = config.inputFile;
-const outputFile = config.outputFile || inputFile.replace(/\.xml$/, '.ndjson');
 
 // Validate Elasticsearch config
 if (!config.esConfig.url || !config.esConfig.index || !config.esConfig.apiKey || !config.esConfig.serverMode) {
